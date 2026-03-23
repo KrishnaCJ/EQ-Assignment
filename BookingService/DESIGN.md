@@ -50,3 +50,50 @@ The API utilizes centralized middleware to ensure all responses follow a predict
 404 Not Found: Resource missing (e.g., invalid Room ID).
 409 Conflict: Overlapping booking detected.
 500 Internal Error: Unexpected server failures.
+
+
+
+Instructions to Run the Test Suite
+================================================================================
+
+Prerequisites
+Node.js: v18.0.0 or higher.
+
+npm: Included with Node.js.
+
+1. Installation
+Navigate to the project root and install the dependencies (Jest and Express):
+
+Bash
+npm install
+2. Running Functional Tests
+To execute the automated test suite provided above:
+
+Bash
+npm test
+Note: This runs Jest with the --experimental-vm-modules flag to support ES Modules.
+
+3. Running Manual Integration Tests
+To verify the API endpoints manually via Postman or cURL:
+
+Start the Server:
+
+Bash
+npm start
+Test Idempotency:
+Send a POST to /bookings with the header Idempotency-Key: unique-1. Send it twice; the second response should be identical to the first without creating a new record.
+
+Test Cancellation Rule:
+
+Create a booking for a time 2 hours from now. Cancel it (Success).
+
+Create a booking for a time 30 minutes from now. Cancel it (Should return 400 ValidationError).
+
+Check Utilization:
+Visit: http://localhost:3000/reports/room-utilization?from=2026-01-01T08:00:00Z&to=2026-12-31T20:00:00Z
+
+Expected Output
+When running npm test, you should see:
+PASS  tests/booking.test.js
+Test Suites: 1 passed, 1 total
+Tests:       7 passed, 7 total
