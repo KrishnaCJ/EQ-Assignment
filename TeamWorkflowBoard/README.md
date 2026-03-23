@@ -36,7 +36,6 @@ TeamWorkflowBoard/
 │   ├── store/              # Zustand state management
 │   ├── types/              # TypeScript type definitions
 │   ├── utils/              # Utility functions
-│   ├── _tests_/            # Test files
 │   ├── App.tsx             # Main application component
 │   ├── main.tsx            # Entry point
 │   └── index.css           # Global styles
