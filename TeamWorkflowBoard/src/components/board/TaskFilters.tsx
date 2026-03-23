@@ -91,7 +91,7 @@ export const TaskFilters: React.FC = () => {
           <div className="flex gap-2">
             <Select
               value={sort.field}
-              onChange={(e) => setSort({ ...sort, field: e.target.value as any })}
+              onChange={(e) => setSort({ ...sort, field: e.target.value as 'createdAt' | 'updatedAt' | 'priority' })}
               options={[
                 { value: 'createdAt', label: 'Created Date' },
                 { value: 'updatedAt', label: 'Updated Date' },

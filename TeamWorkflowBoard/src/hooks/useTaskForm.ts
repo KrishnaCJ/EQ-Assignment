@@ -31,7 +31,7 @@ export const useTaskForm = ({ task, onSuccess }: UseTaskFormProps) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleChange = (field: string, value: any) => {
+  const handleChange = (field: string, value: string | string[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     setHasChanges(true);
   };

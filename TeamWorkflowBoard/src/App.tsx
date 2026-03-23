@@ -8,10 +8,11 @@ import { TaskForm } from './components/forms/TaskForm';
 import { Button } from './components/ui/Button';
 import { Modal } from './components/ui/Modal';
 import { Toast } from './components/ui/Toast';
+import { Task } from './types/task';
 
 function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingTask, setEditingTask] = useState<any>(null);
+  const [editingTask, setEditingTask] = useState<null | Task>(null);
   const { loadFromStorage, toast, setToast, migrationPerformed } = useTaskStore();
 
   useEffect(() => {
@@ -74,7 +75,7 @@ function App() {
         {toast && (
           <Toast
             message={toast.message}
-            type={toast.type as any}
+            type={toast.type as 'success' | 'error' | 'info' | 'warning'}
             onClose={() => setToast(null)}
           />
         )}

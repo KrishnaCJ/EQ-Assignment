@@ -1,11 +1,12 @@
 import { create } from 'zustand';
 import { Task, TaskFilters, TaskSort } from '../types/task';
+import { migrateData, CURRENT_SCHEMA_VERSION } from '../utils/migrations';
 
 interface TaskStore {
   tasks: Task[];
   filters: TaskFilters;
   sort: TaskSort;
-  toast: { message: string; type: string } | null;
+  toast: { message: string; type: 'success' | 'error' | 'info' | 'warning' } | null;
   migrationPerformed: boolean;
   
   addTask: (task: Task) => void;
@@ -13,7 +14,7 @@ interface TaskStore {
   deleteTask: (id: string) => void;
   setFilters: (filters: Partial<TaskFilters>) => void;
   setSort: (sort: TaskSort) => void;
-  setToast: (toast: { message: string; type: string } | null) => void;
+  setToast: (toast: { message: string; type: 'success' | 'error' | 'info' | 'warning' } | null) => void;
   loadFromStorage: () => void;
   saveToStorage: () => void;
 }
@@ -115,7 +116,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     set({ sort });
   },
 
-  setToast: (toast) => {
+  setToast: (toast: { message: string; type: 'success' | 'error' | 'info' | 'warning' } | null) => {
     set({ toast });
     if (toast) {
       setTimeout(() => set({ toast: null }), 3000);
@@ -127,12 +128,8 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       const stored = localStorage.getItem('workflow-board-data');
       if (stored) {
         const parsed = JSON.parse(stored);
-        const tasks = parsed.tasks.map((task: any) => ({
-          ...task,
-          createdAt: new Date(task.createdAt),
-          updatedAt: new Date(task.updatedAt),
-        }));
-        set({ tasks });
+        const migrated = migrateData(parsed);
+        set({ tasks: migrated.tasks, migrationPerformed: parsed.schemaVersion !== CURRENT_SCHEMA_VERSION });
       } else {
         set({ tasks: SAMPLE_TASKS });
         get().saveToStorage();

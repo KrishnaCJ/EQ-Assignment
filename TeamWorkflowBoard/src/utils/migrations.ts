@@ -8,7 +8,7 @@ interface StoredData {
   tasks: Task[];
 }
 
-export function migrateData(rawData: any): StoredData {
+export function migrateData(rawData: { schemaVersion?: number; tasks?: Array<{ createdAt?: string; updatedAt?: string; tags?: string[] }> }): StoredData {
   if (!rawData || typeof rawData !== 'object') {
     return { schemaVersion: CURRENT_SCHEMA_VERSION, tasks: [] };
   }
@@ -18,7 +18,7 @@ export function migrateData(rawData: any): StoredData {
 
   // Migration from v1 to v2
   if (version === 1) {
-    tasks = tasks.map((task: any) => ({
+    tasks = tasks.map((task: { createdAt?: string; updatedAt?: string; tags?: string[] }) => ({
       ...task,
       // Convert date strings to Date objects
       createdAt: task.createdAt ? new Date(task.createdAt) : new Date(),

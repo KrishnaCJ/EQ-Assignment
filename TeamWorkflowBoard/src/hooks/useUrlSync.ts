@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTaskStore } from '../store/useTaskStore';
-import { TaskFilters, TaskSort } from '../types/task';
+import { TaskFilters, TaskPriority, TaskSort, TaskStatus } from '../types/task';
 
 export const useUrlSync = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -14,19 +14,19 @@ export const useUrlSync = () => {
     const urlSort: Partial<TaskSort> = {};
 
     const statuses = searchParams.get('statuses');
-    if (statuses) urlFilters.statuses = statuses.split(',') as any;
+    if (statuses) urlFilters.statuses = statuses.split(',') as TaskStatus[];
 
     const priorities = searchParams.get('priorities');
-    if (priorities) urlFilters.priorities = priorities.split(',') as any;
+    if (priorities) urlFilters.priorities = priorities.split(',') as TaskPriority[];
 
     const search = searchParams.get('search');
     if (search) urlFilters.search = search;
 
     const sortField = searchParams.get('sortField');
-    if (sortField) urlSort.field = sortField as any;
+    if (sortField) urlSort.field = sortField as 'createdAt' | 'updatedAt' | 'priority';
 
     const sortOrder = searchParams.get('sortOrder');
-    if (sortOrder) urlSort.order = sortOrder as any;
+    if (sortOrder) urlSort.order = sortOrder as 'asc' | 'desc';
 
     if (Object.keys(urlFilters).length) setFilters(urlFilters);
     if (Object.keys(urlSort).length) setSort(urlSort as TaskSort);
