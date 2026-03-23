@@ -21,11 +21,6 @@ npm install
 # Start development server
 npm run dev
 
-# Run tests
-npm test
-
-# Build for production
-npm run build
 ```
 
 ## 📁 Project Structure
