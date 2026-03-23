@@ -90,20 +90,6 @@ App (Container)
 - Screen reader friendly toast notifications
 - Semantic HTML structure
 
-## 🧪 Testing
-
-Tests are written using Jest and React Testing Library.
-
-```bash
-# Run tests
-npm test
-
-# Run with coverage
-npm run test:coverage
-
-# Watch mode
-npm run test:watch
-```
 
 ### Test Coverage
 - Core workflow: Creating and editing tasks
