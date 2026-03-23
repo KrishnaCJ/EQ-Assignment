@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Water Tank Problem - Interactive</title>
+    <style>
+        :root { --block: #FFD700; --water: #00adff; --bg: #f0f2f5; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 40px; }
+        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 650px; text-align: center; }
+        .controls { margin-bottom: 25px; }
+        input { padding: 12px; width: 80%; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem; outline: none; transition: border-color 0.3s; }
+        input:focus { border-color: var(--water); }
+        .result-badge { font-size: 1.8rem; font-weight: bold; margin: 20px 0; color: #333; }
+        .svg-wrapper { overflow-x: auto; background: #fafafa; border-radius: 8px; padding: 20px; border: 1px solid #eee; }
+        svg { border-bottom: 4px solid #444; display: block; margin: 0 auto; }
+        .block-rect { fill: var(--block); stroke: #ccac00; stroke-width: 1; }
+        .water-rect { fill: var(--water); opacity: 0.85; transition: all 0.4s ease; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Water Tank Problem</h2>
+    <p>Enter block heights separated by commas to calculate trapped water.</p>
+    
+    <div class="controls">
+        <input type="text" id="userInput" value="0,4,0,0,0,6,0,6,4,0" placeholder="e.g. 0,4,0,0,0,6,0,6,4,0">
+    </div>
+
+    <div class="result-badge" id="displayTotal">18 Units</div>
+
+    <div class="svg-wrapper">
+        <svg id="visualizer"></svg>
+    </div>
+</div>
+
+<script>
+    const inputField = document.getElementById('userInput');
+    const resultDisplay = document.getElementById('displayTotal');
+    const svg = document.getElementById('visualizer');
+    const UNIT = 35; // Size of one unit in pixels
+
+    function calculate(heights) {
+        const n = heights.length;
+        if (n === 0) return { total: 0, water: [] };
+
+        const leftMax = new Array(n).fill(0);
+        const rightMax = new Array(n).fill(0);
+        const water = new Array(n).fill(0);
+        let total = 0;
+
+        leftMax[0] = heights[0];
+        for (let i = 1; i < n; i++) leftMax[i] = Math.max(leftMax[i-1], heights[i]);
+
+        rightMax[n-1] = heights[n-1];
+        for (let i = n-2; i >= 0; i--) rightMax[i] = Math.max(rightMax[i+1], heights[i]);
+
+        for (let i = 0; i < n; i++) {
+            const level = Math.min(leftMax[i], rightMax[i]) - heights[i];
+            water[i] = level > 0 ? level : 0;
+            total += water[i];
+        }
+        return { total, water };
+    }
+
+    function update() {
+        const rawValues = inputField.value.split(',');
+        const heights = rawValues.map(v => {
+            const n = parseInt(v.trim());
+            return isNaN(n) || n < 0 ? 0 : n;
+        });
+
+        const { total, water } = calculate(heights);
+        resultDisplay.innerText = `${total} Units`;
+
+        const maxH = Math.max(...heights, 1);
+        const canvasW = heights.length * UNIT;
+        const canvasH = (maxH + 1) * UNIT;
+
+        svg.setAttribute('width', canvasW);
+        svg.setAttribute('height', canvasH);
+
+        let content = '';
+        heights.forEach((h, i) => {
+            const x = i * UNIT;
+            
+            if (water[i] > 0) {
+                const wH = water[i] * UNIT;
+                const wY = canvasH - (h * UNIT) - wH;
+                content += `<rect x="${x}" y="${wY}" width="${UNIT}" height="${wH}" class="water-rect" />`;
+            }
+
+            if (h > 0) {
+                const bH = h * UNIT;
+                const bY = canvasH - bH;
+                content += `<rect x="${x}" y="${bY}" width="${UNIT}" height="${bH}" class="block-rect" />`;
+            }
+        });
+
+        svg.innerHTML = content;
+    }
+
+    inputField.addEventListener('input', update);
+    update();
+</script>
+
+</body>
+</html>
