@@ -62,7 +62,9 @@ describe('UI Behavior: Filters and Status Changes', () => {
   test('should filter tasks by status', async () => {
     render(<App />);
 
-    const inProgressButton = screen.getByRole('button', { name: /in progress/i });
+    const statusButtons = screen.getAllByRole('button', { name: /in progress/i });
+    // Get the filter button (first one in the filters section)
+    const inProgressButton = statusButtons[0];
     await userEvent.click(inProgressButton);
 
     expect(mockSetFilters).toHaveBeenCalledWith({
@@ -101,12 +103,13 @@ describe('UI Behavior: Filters and Status Changes', () => {
     render(<App />);
 
     const statusSelects = screen.getAllByRole('combobox');
-    const firstStatusSelect = statusSelects[0];
+    // The last combobox in the task card is the status dropdown
+    const taskStatusSelect = statusSelects[statusSelects.length - 1];
 
-    fireEvent.change(firstStatusSelect, { target: { value: 'Done' } });
+    fireEvent.change(taskStatusSelect, { target: { value: 'Done' } });
 
     expect(mockUpdateTask).toHaveBeenCalledWith(
-      '1',
+      '2',
       expect.objectContaining({
         status: 'Done'
       })
@@ -116,7 +119,9 @@ describe('UI Behavior: Filters and Status Changes', () => {
   test('should sort tasks by priority', async () => {
     render(<App />);
 
-    const sortSelect = screen.getByRole('combobox');
+    const sortSelects = screen.getAllByRole('combobox');
+    // The first combobox in the filters is the sort dropdown
+    const sortSelect = sortSelects[0];
     fireEvent.change(sortSelect, { target: { value: 'priority' } });
 
     expect(mockSetSort).toHaveBeenCalledWith({

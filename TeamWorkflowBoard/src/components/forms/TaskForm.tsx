@@ -95,6 +95,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ task, onSuccess, onCancel })
         assignee: data.assignee || '',
       };
       addTask(newTask);
+      setToast({ message: 'Task created successfully', type: 'success' });
     }
     onSuccess();
   };
