@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTaskStore } from '../../store/useTaskStore';
@@ -29,10 +29,11 @@ interface TaskFormProps {
 export const TaskForm: React.FC<TaskFormProps> = ({ task, onSuccess, onCancel }) => {
   const { addTask, updateTask, setToast } = useTaskStore();
   const [hasChanges, setHasChanges] = useState(false);
+  const [tags, setTags] = useState<string[]>(task?.tags || []);
+  const [tagInput, setTagInput] = useState('');
 
   const {
     register,
-    control,
     handleSubmit,
     formState: { errors, isDirty },
     watch,
@@ -55,11 +56,6 @@ export const TaskForm: React.FC<TaskFormProps> = ({ task, onSuccess, onCancel })
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: 'tags',
-  });
-
   useEffect(() => {
     const subscription = watch(() => {
       setHasChanges(isDirty);
@@ -80,9 +76,12 @@ export const TaskForm: React.FC<TaskFormProps> = ({ task, onSuccess, onCancel })
   }, [hasChanges]);
 
   const onSubmit = (data: TaskFormData) => {
+    const finalTags = tags.filter(tag => tag.trim());
+    
     if (task) {
       updateTask(task.id, {
         ...data,
+        tags: finalTags,
         updatedAt: new Date(),
       });
       setToast({ message: 'Task updated successfully', type: 'success' });
@@ -92,7 +91,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ task, onSuccess, onCancel })
         id: Date.now().toString(),
         createdAt: new Date(),
         updatedAt: new Date(),
-        tags: data.tags.filter(tag => tag.trim()),
+        tags: finalTags,
         assignee: data.assignee || '',
       };
       addTask(newTask);
@@ -100,8 +99,19 @@ export const TaskForm: React.FC<TaskFormProps> = ({ task, onSuccess, onCancel })
     onSuccess();
   };
 
+  const addTag = () => {
+    if (tagInput.trim()) {
+      setTags([...tags, tagInput.trim()]);
+      setTagInput('');
+    }
+  };
+
+  const removeTag = (index: number) => {
+    setTags(tags.filter((_, i) => i !== index));
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
       <TextInput
         label="Title"
         {...register('title')}
@@ -117,26 +127,36 @@ export const TaskForm: React.FC<TaskFormProps> = ({ task, onSuccess, onCancel })
         rows={4}
       />
 
-      <div className="grid grid-cols-2 gap-4">
-        <Select
-          label="Status"
-          {...register('status')}
-          options={[
-            { value: 'Backlog', label: 'Backlog' },
-            { value: 'In Progress', label: 'In Progress' },
-            { value: 'Done', label: 'Done' },
-          ]}
-        />
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="block text-xs font-medium text-gray-700 mb-1">
+            Status
+          </label>
+          <Select
+            {...register('status')}
+            options={[
+              { value: 'Backlog', label: 'Backlog' },
+              { value: 'In Progress', label: 'In Progress' },
+              { value: 'Done', label: 'Done' },
+            ]}
+            className="text-xs"
+          />
+        </div>
 
-        <Select
-          label="Priority"
-          {...register('priority')}
-          options={[
-            { value: 'Low', label: 'Low' },
-            { value: 'Medium', label: 'Medium' },
-            { value: 'High', label: 'High' },
-          ]}
-        />
+        <div>
+          <label className="block text-xs font-medium text-gray-700 mb-1">
+            Priority
+          </label>
+          <Select
+            {...register('priority')}
+            options={[
+              { value: 'Low', label: 'Low' },
+              { value: 'Medium', label: 'Medium' },
+              { value: 'High', label: 'High' },
+            ]}
+            className="text-xs"
+          />
+        </div>
       </div>
 
       <TextInput
@@ -149,38 +169,54 @@ export const TaskForm: React.FC<TaskFormProps> = ({ task, onSuccess, onCancel })
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Tags
         </label>
-        {fields.map((field, index) => (
-          <div key={field.id} className="flex gap-2 mb-2">
+        <div className="flex gap-2 mb-2">
+          <div className="flex-1 min-w-0">
             <TextInput
-              {...register(`tags.${index}`)}
               placeholder="Enter tag"
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  addTag();
+                }
+              }}
               fullWidth
             />
-            <Button
-              type="button"
-              variant="destructive"
-              size="sm"
-              onClick={() => remove(index)}
-            >
-              Remove
-            </Button>
           </div>
-        ))}
-        <Button
-          type="button"
-          variant="secondary"
-          size="sm"
-          onClick={() => append('')}
-        >
-          + Add Tag
-        </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            onClick={addTag}
+          >
+            Add
+          </Button>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {tags.map((tag, index) => (
+            <div
+              key={index}
+              className="flex items-center gap-2 bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm"
+            >
+              <span>{tag}</span>
+              <button
+                type="button"
+                onClick={() => removeTag(index)}
+                className="text-blue-600 hover:text-blue-800 font-bold"
+              >
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
 
-      <div className="flex gap-3 pt-4">
-        <Button type="submit">
+      <div className="flex gap-3 pt-2">
+        <Button type="submit" size="sm">
           {task ? 'Update Task' : 'Create Task'}
         </Button>
-        <Button type="button" variant="secondary" onClick={onCancel}>
+        <Button type="button" variant="secondary" size="sm" onClick={onCancel}>
           Cancel
         </Button>
       </div>

@@ -8,7 +8,6 @@ export const useUrlSync = () => {
   const { filters, sort, setFilters, setSort } = useTaskStore();
   const isInitialMount = useRef(true);
 
-  // Load from URL on mount
   useEffect(() => {
     const urlFilters: Partial<TaskFilters> = {};
     const urlSort: Partial<TaskSort> = {};
@@ -34,7 +33,6 @@ export const useUrlSync = () => {
     isInitialMount.current = false;
   }, []);
 
-  // Save to URL on changes
   useEffect(() => {
     if (isInitialMount.current) return;
 

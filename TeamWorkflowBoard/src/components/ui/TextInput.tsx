@@ -12,7 +12,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
     const inputId = id || label?.toLowerCase().replace(/\s+/g, '-');
 
     return (
-      <div className={clsx('mb-4', fullWidth && 'w-full')}>
+      <div className={clsx(fullWidth && 'w-full')}>
         {label && (
           <label
             htmlFor={inputId}
@@ -25,7 +25,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
           ref={ref}
           id={inputId}
           className={clsx(
-            'rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500',
+            'rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 h-[34px]',
             error && 'border-red-500 focus:border-red-500 focus:ring-red-500',
             fullWidth && 'w-full',
             className

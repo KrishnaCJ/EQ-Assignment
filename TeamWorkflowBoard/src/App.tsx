@@ -1,4 +1,3 @@
-// src/App.tsx
 import { useEffect, useState } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { useTaskStore } from './store/useTaskStore';

@@ -18,7 +18,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
     const selectId = id || label?.toLowerCase().replace(/\s+/g, '-');
 
     return (
-      <div className={clsx('mb-4', fullWidth && 'w-full')}>
+      <div className={clsx(fullWidth && 'w-full')}>
         {label && (
           <label htmlFor={selectId} className="block text-sm font-medium text-gray-700 mb-1">
             {label}
@@ -28,7 +28,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           ref={ref}
           id={selectId}
           className={clsx(
-            'rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500',
+            'rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 h-[34px]',
             error && 'border-red-500 focus:border-red-500 focus:ring-red-500',
             fullWidth && 'w-full',
             className

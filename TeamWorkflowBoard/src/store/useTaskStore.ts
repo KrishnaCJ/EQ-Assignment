@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { Task, TaskFilters, TaskSort } from '../types/task';
-import { migrateData, CURRENT_SCHEMA_VERSION } from '../utils/migrations';
 
 interface TaskStore {
   tasks: Task[];
@@ -128,8 +127,12 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       const stored = localStorage.getItem('workflow-board-data');
       if (stored) {
         const parsed = JSON.parse(stored);
-        const migrated = migrateData(parsed);
-        set({ tasks: migrated.tasks, migrationPerformed: parsed.schemaVersion !== CURRENT_SCHEMA_VERSION });
+        const tasks = (parsed.tasks || []).map((task: any) => ({
+          ...task,
+          createdAt: new Date(task.createdAt),
+          updatedAt: new Date(task.updatedAt),
+        }));
+        set({ tasks });
       } else {
         set({ tasks: SAMPLE_TASKS });
         get().saveToStorage();
@@ -143,7 +146,6 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
   saveToStorage: () => {
     try {
       const data = {
-        schemaVersion: 2,
         tasks: get().tasks,
       };
       localStorage.setItem('workflow-board-data', JSON.stringify(data));

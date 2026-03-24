@@ -49,16 +49,17 @@ export const TaskFilters: React.FC = () => {
     <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-xs font-medium text-gray-700 mb-1">
             Status
           </label>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1">
             {statusOptions.map(status => (
               <Button
                 key={status}
                 size="sm"
                 variant={filters.statuses.includes(status) ? 'primary' : 'secondary'}
                 onClick={() => handleStatusToggle(status)}
+                className="text-xs px-2 py-1"
               >
                 {status}
               </Button>
@@ -67,16 +68,17 @@ export const TaskFilters: React.FC = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-xs font-medium text-gray-700 mb-1">
             Priority
           </label>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1">
             {priorityOptions.map(priority => (
               <Button
                 key={priority}
                 size="sm"
                 variant={filters.priorities.includes(priority) ? 'primary' : 'secondary'}
                 onClick={() => handlePriorityToggle(priority)}
+                className="text-xs px-2 py-1"
               >
                 {priority}
               </Button>
@@ -85,10 +87,10 @@ export const TaskFilters: React.FC = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-xs font-medium text-gray-700 mb-1">
             Sort By
           </label>
-          <div className="flex gap-2">
+          <div className="flex gap-1 items-center">
             <Select
               value={sort.field}
               onChange={(e) => setSort({ ...sort, field: e.target.value as 'createdAt' | 'updatedAt' | 'priority' })}
@@ -97,11 +99,13 @@ export const TaskFilters: React.FC = () => {
                 { value: 'updatedAt', label: 'Updated Date' },
                 { value: 'priority', label: 'Priority' },
               ]}
+              className="text-xs"
             />
             <Button
               size="sm"
               variant="secondary"
               onClick={() => setSort({ ...sort, order: sort.order === 'asc' ? 'desc' : 'asc' })}
+              className="text-xs px-2 py-1"
             >
               {sort.order === 'asc' ? '↑' : '↓'}
             </Button>
@@ -109,8 +113,8 @@ export const TaskFilters: React.FC = () => {
         </div>
       </div>
 
-      <div className="mt-4 flex gap-2">
-        <div className="flex-1">
+      <div className="mt-4 flex gap-2 items-center">
+        <div className="flex-1 min-w-0">
           <TextInput
             placeholder="Search by title or description..."
             value={localSearch}
@@ -118,8 +122,8 @@ export const TaskFilters: React.FC = () => {
             onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
           />
         </div>
-        <Button onClick={handleSearch}>Search</Button>
-        <Button variant="secondary" onClick={clearFilters}>
+        <Button size="sm" onClick={handleSearch} className="text-xs px-2 py-1">Search</Button>
+        <Button size="sm" variant="secondary" onClick={clearFilters} className="text-xs px-2 py-1">
           Clear Filters
         </Button>
       </div>

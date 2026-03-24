@@ -65,7 +65,6 @@ export const useTaskForm = ({ task, onSuccess }: UseTaskFormProps) => {
     }
   };
 
-  // Warn on navigation if has changes
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (hasChanges) {
