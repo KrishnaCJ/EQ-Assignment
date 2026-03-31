@@ -1,59 +1,71 @@
-function solveMarsLandProfit(n) {
-  const BUILDINGS = [
-    { id: "T", name: "Theatre", time: 5, rate: 1500 },
-    { id: "P", name: "Pub", time: 4, rate: 1000 },
-    { id: "C", name: "Commercial Park", time: 10, rate: 3000 }
-  ];
+const BUILDINGS = [
+  { symbol: 'T', name: 'Theatre', buildTime: 5, earningRate: 1500 },
+  { symbol: 'P', name: 'Pub', buildTime: 4, earningRate: 1000 },
+  { symbol: 'C', name: 'Commercial Park', buildTime: 10, earningRate: 2000 }
+];
 
-  const maxEarnings = new Array(n + 1).fill(0);
-  const lastBuildingAdded = new Array(n + 1).fill(null);
+function computeEarnings(theatreCount, pubCount, commercialCount, totalTime) {
+  let elapsedTime = 0, totalEarnings = 0;
+  for (let i = 0; i < theatreCount; i++) {
+    elapsedTime += 5;
+    totalEarnings += (totalTime - elapsedTime) * 1500;
+  }
+  for (let i = 0; i < pubCount; i++) {
+    elapsedTime += 4;
+    totalEarnings += (totalTime - elapsedTime) * 1000;
+  }
+  for (let i = 0; i < commercialCount; i++) {
+    elapsedTime += 10;
+    totalEarnings += (totalTime - elapsedTime) * 2000;
+  }
+  return totalEarnings;
+}
 
-  for (let t = 1; t <= n; t++) {
-    maxEarnings[t] = maxEarnings[t - 1];
-    
+function maxProfitDP(totalTime) {
+  const dpArray = new Array(totalTime + 1).fill(0);
+  for (let currentTime = 1; currentTime <= totalTime; currentTime++) {
     for (const building of BUILDINGS) {
-      if (t >= building.time) {
-        const buildingEarnings = (n - t) * building.rate;
-        const currentProfit = buildingEarnings + maxEarnings[t - building.time];
-        
-        if (currentProfit > maxEarnings[t]) {
-          maxEarnings[t] = currentProfit;
-          lastBuildingAdded[t] = building;
+      if (currentTime >= building.buildTime) {
+        const profitValue = (currentTime - building.buildTime) * building.earningRate + dpArray[currentTime - building.buildTime];
+        if (profitValue > dpArray[currentTime]) {
+          dpArray[currentTime] = profitValue;
         }
       }
     }
   }
-
-  const mix = { T: 0, P: 0, C: 0 };
-  let currentTime = n;
-
-  while (currentTime > 0) {
-    let found = false;
-    for (let t = currentTime; t > 0; t--) {
-      if (lastBuildingAdded[t]) {
-        const building = lastBuildingAdded[t];
-        mix[building.id]++;
-        currentTime = t - building.time;
-        found = true;
-        break;
-      }
-    }
-    if (!found) break;
-  }
-
-  return {
-    earnings: maxEarnings[n],
-    solution: `T: ${mix.T} P: ${mix.P} C: ${mix.C}`
-  };
+  return dpArray[totalTime];
 }
 
-const testCases = [7, 8, 13];
+function findAllCombinations(totalTime) {
+  const maxEarnings = maxProfitDP(totalTime);
+  if (maxEarnings === 0) return { maxEarnings: 0, combinations: [] };
+
+  const combinations = [];
+  const maxBuildTime = totalTime - 1;
+
+  for (let theatreCount = 0; theatreCount * 5 <= maxBuildTime; theatreCount++) {
+    for (let pubCount = 0; theatreCount * 5 + pubCount * 4 <= maxBuildTime; pubCount++) {
+      for (let commercialCount = 0; theatreCount * 5 + pubCount * 4 + commercialCount * 10 <= maxBuildTime; commercialCount++) {
+        if (theatreCount + pubCount + commercialCount === 0) continue;
+        if (computeEarnings(theatreCount, pubCount, commercialCount, totalTime) === maxEarnings) {
+          combinations.push({ T: theatreCount, P: pubCount, C: commercialCount });
+        }
+      }
+    }
+  }
+  return { maxEarnings: maxEarnings, combinations: combinations };
+}
+
+const testCases = [7, 8, 13, 49];
 
 console.log("--- Mars Land Challenge Results ---");
 testCases.forEach((time) => {
-  const result = solveMarsLandProfit(time);
+  const result = findAllCombinations(time);
   console.log(`Input Time: ${time}`);
-  console.log(`Output -> Earnings: $${result.earnings}`);
-  console.log(`          Solution: ${result.solution}`);
+  console.log(`Max Earnings: $${result.maxEarnings}`);
+  console.log(`Valid combinations:`);
+  result.combinations.forEach((combo) => {
+    console.log(`T: ${combo.T}, P: ${combo.P}, C: ${combo.C}`);
+  });
   console.log('-----------------------------------');
 });
