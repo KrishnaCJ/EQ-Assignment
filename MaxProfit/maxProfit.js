@@ -9,10 +9,13 @@ function solveMarsLandProfit(n) {
   const lastBuildingAdded = new Array(n + 1).fill(null);
 
   for (let t = 1; t <= n; t++) {
+    maxEarnings[t] = maxEarnings[t - 1];
+    
     for (const building of BUILDINGS) {
       if (t >= building.time) {
-        const currentProfit = (t - building.time) * building.rate + maxEarnings[t - building.time];
-
+        const buildingEarnings = (n - t) * building.rate;
+        const currentProfit = buildingEarnings + maxEarnings[t - building.time];
+        
         if (currentProfit > maxEarnings[t]) {
           maxEarnings[t] = currentProfit;
           lastBuildingAdded[t] = building;
@@ -22,12 +25,20 @@ function solveMarsLandProfit(n) {
   }
 
   const mix = { T: 0, P: 0, C: 0 };
-  let remainingTime = n;
+  let currentTime = n;
 
-  while (remainingTime > 0 && lastBuildingAdded[remainingTime]) {
-    const building = lastBuildingAdded[remainingTime];
-    mix[building.id]++;
-    remainingTime -= building.time;
+  while (currentTime > 0) {
+    let found = false;
+    for (let t = currentTime; t > 0; t--) {
+      if (lastBuildingAdded[t]) {
+        const building = lastBuildingAdded[t];
+        mix[building.id]++;
+        currentTime = t - building.time;
+        found = true;
+        break;
+      }
+    }
+    if (!found) break;
   }
 
   return {
