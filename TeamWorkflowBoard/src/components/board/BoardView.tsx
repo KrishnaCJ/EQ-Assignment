@@ -29,14 +29,17 @@ export const BoardView: React.FC<BoardViewProps> = ({ onEditTask }) => {
     });
 
     filtered.sort((a, b) => {
-      let aVal = a[sort.field];
-      let bVal = b[sort.field];
-
       if (sort.field === 'priority') {
         const priorityOrder = { Low: 1, Medium: 2, High: 3 };
-        aVal = priorityOrder[a.priority];
-        bVal = priorityOrder[b.priority];
+        const aPriority = priorityOrder[a.priority];
+        const bPriority = priorityOrder[b.priority];
+        if (aPriority < bPriority) return sort.order === 'asc' ? -1 : 1;
+        if (aPriority > bPriority) return sort.order === 'asc' ? 1 : -1;
+        return 0;
       }
+
+      const aVal = a[sort.field];
+      const bVal = b[sort.field];
 
       if (aVal < bVal) return sort.order === 'asc' ? -1 : 1;
       if (aVal > bVal) return sort.order === 'asc' ? 1 : -1;
